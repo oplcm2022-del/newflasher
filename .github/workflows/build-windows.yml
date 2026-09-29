@@ -1,0 +1,40 @@
+name: Build Newflasher Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            make wget tar xxd \
+            mingw-w64 \
+            autoconf automake libtool
+
+      - name: Verify version
+        run: |
+          cat version.h
+
+      - name: Build Windows EXE
+        run: |
+          make newflasher.exe
+
+      - name: SHA256
+        run: |
+          sha256sum newflasher.exe | tee newflasher.exe.sha256
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: newflasher-v60-windows
+          path: |
+            newflasher.exe
+            newflasher.exe.sha256
