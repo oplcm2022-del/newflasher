@@ -1,4 +1,5 @@
-name: Build Newflasher Windows
+
+name: Build Newflasher Windows v60
 
 on:
   workflow_dispatch:
@@ -8,8 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout Newflasher v60
         uses: actions/checkout@v4
+        with:
+          ref: d3936b9c105669b228b1d03e0cc9fc70ea94f071
 
       - name: Install build tools
         run: |
@@ -19,9 +22,11 @@ jobs:
             mingw-w64 \
             autoconf automake libtool
 
-      - name: Verify version
+      - name: Verify version 60
         run: |
+          git rev-parse HEAD
           cat version.h
+          grep -Eq '^[[:space:]]*#define[[:space:]]+VERSION[[:space:]]+60([[:space:]]|$)' version.h
 
       - name: Build Windows EXE
         run: |
