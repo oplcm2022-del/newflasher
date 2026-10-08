@@ -51,7 +51,7 @@ jobs:
           if ! curl --fail --location --retry 3 --silent --show-error \
             'https://github.com/libexpat/libexpat/releases/download/R_2_2_9/expat-2.2.9.tar.gz' \
             -o expat-2.2.9.tar.gz; then
-            echo 'GitHub Expat download failed; trying SourceForge'
+            echo 'GitHub Expat download failed; trying project SourceForge archive'
             curl --fail --location --retry 3 --silent --show-error \
               'https://sourceforge.net/projects/expat/files/expat/2.2.9/expat-2.2.9-RENAMED-VULNERABLE-PLEASE-USE-2.4.1-INSTEAD.tar.gz/download' \
               -o expat-2.2.9.tar.gz
@@ -60,13 +60,17 @@ jobs:
           tar -xzf expat-2.2.9.tar.gz
           test -f expat-2.2.9/configure
 
-      - name: Embed official Sony flash driver
+      - name: Bundle driver from Newflasher maintainer repository
         run: |
           set -euo pipefail
           curl --fail --location --retry 3 --silent --show-error \
-            'https://software.sonymobile.com/drivers/installers/latest/Sony_Mobile_Software_Update_Drivers_x64_Setup.msi' \
+            'https://raw.githubusercontent.com/munjeni/newflasher/master/Sony_Mobile_Software_Update_Drivers_x64_Setup.msi' \
             -o GordonGate
+          echo 'Driver source: munjeni/newflasher on GitHub (not Sony original host)'
+          file GordonGate
+          test "$(stat -c%s GordonGate)" -gt 1048576
           test "$(od -An -tx1 -N8 GordonGate | tr -d ' \n')" = 'd0cf11e0a1b11ae1'
+          sha256sum GordonGate
           mkdir -p include
           xxd --include GordonGate > include/GordonGate.h
           grep -q 'GordonGate_len' include/GordonGate.h
